@@ -6,9 +6,9 @@
 	"observability": {
 		"enabled": true
 	},
-	// Test Cron Trigger: Runs every 1 minute for immediate testing
+	// Cron Trigger: Runs automatically every 12 hours (00:00 and 12:00 UTC)
 	"triggers": {
-		"crons": ["* * * * *"]
+		"crons": ["0 */12 * * *"]
 	},
 	// Environment Variables
 	"vars": {
