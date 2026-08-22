@@ -8,10 +8,11 @@
 	},
 	/**
 	 * Cron Triggers
-	 * Runs the Worker automatically every 12 hours (00:00 and 12:00 UTC)
+	 * TEST TRIGGER: Runs every 1 minute (* * * * *) for immediate verification.
+	 * After testing, change back to: "0 */12 * * *"
 	 */
 	"triggers": {
-		"crons": ["0 */12 * * *"]
+		"crons": ["* * * * *"]
 	},
 	/**
 	 * Environment Variables
