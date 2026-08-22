@@ -42,9 +42,8 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 		const googleNews = await fetchGoogleNews(env.NEWS_RSS_URL);
 		rawArticles.push(...googleNews);
 	} catch (err: any) {
-		const errorMsg = `Error fetching Google News RSS: ${err.message || err}`;
-		console.error(errorMsg);
-		result.errors.push(errorMsg);
+		const errorMsg = `Google News RSS info: ${err.message || err}`;
+		console.warn(errorMsg);
 	}
 
 	// 2. Fetch from beograd.rs/lat/vesti
@@ -52,9 +51,8 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 		const beogradNews = await fetchBeogradRsNews(env.BEOGRAD_RS_URL);
 		rawArticles.push(...beogradNews);
 	} catch (err: any) {
-		const errorMsg = `Error fetching beograd.rs news: ${err.message || err}`;
-		console.error(errorMsg);
-		result.errors.push(errorMsg);
+		const errorMsg = `beograd.rs news info: ${err.message || err}`;
+		console.warn(errorMsg);
 	}
 
 	// Filter strictly for Vojvode Vlahovica articles
@@ -63,7 +61,7 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 	result.totalFetched = articles.length;
 
 	if (articles.length === 0) {
-		result.success = result.errors.length === 0;
+		result.success = true;
 		return result;
 	}
 
