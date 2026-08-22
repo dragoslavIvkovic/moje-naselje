@@ -7,8 +7,9 @@ export async function fetchGoogleNews(rssUrl: string = DEFAULT_RSS_URL): Promise
 	const urlToFetch = rssUrl || DEFAULT_RSS_URL;
 	const response = await fetch(urlToFetch, {
 		headers: {
-			'User-Agent': 'Mozilla/5.0 (compatible; CloudflareWorker-NewsBot/1.0)',
-			'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+			'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+			'Accept': 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.1',
+			'Accept-Language': 'sr-Latn,sr;q=0.9,en-US;q=0.8,en;q=0.7'
 		}
 	});
 
