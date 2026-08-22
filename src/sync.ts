@@ -1,5 +1,6 @@
 import { Env, NewsArticle, SyncResult } from './types';
 import { fetchGoogleNews } from './rss';
+import { fetchBeogradRsNews } from './beograd-rs';
 import { publishToViberChannel } from './viber';
 
 async function hashUrl(url: string): Promise<string> {
@@ -14,7 +15,7 @@ async function hashUrl(url: string): Promise<string> {
 const KV_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 // Maximum articles to post per cron execution to respect Viber rate limits and Cloudflare execution time
-const MAX_POSTS_PER_RUN = 5;
+const MAX_POSTS_PER_RUN = 20;
 
 export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 	const result: SyncResult = {
@@ -26,25 +27,37 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 		articles: []
 	};
 
-	let articles: NewsArticle[] = [];
+	const allArticles: NewsArticle[] = [];
 
+	// 1. Fetch from Google News RSS
 	try {
-		articles = await fetchGoogleNews(env.NEWS_RSS_URL);
-		result.totalFetched = articles.length;
+		const googleNews = await fetchGoogleNews(env.NEWS_RSS_URL);
+		allArticles.push(...googleNews);
 	} catch (err: any) {
-		const errorMsg = `Error fetching/parsing RSS: ${err.message || err}`;
+		const errorMsg = `Error fetching Google News RSS: ${err.message || err}`;
 		console.error(errorMsg);
 		result.errors.push(errorMsg);
-		result.success = false;
+	}
+
+	// 2. Fetch from beograd.rs/lat/vesti
+	try {
+		const beogradNews = await fetchBeogradRsNews(env.BEOGRAD_RS_URL);
+		allArticles.push(...beogradNews);
+	} catch (err: any) {
+		const errorMsg = `Error fetching beograd.rs news: ${err.message || err}`;
+		console.error(errorMsg);
+		result.errors.push(errorMsg);
+	}
+
+	result.totalFetched = allArticles.length;
+
+	if (allArticles.length === 0) {
+		result.success = result.errors.length === 0;
 		return result;
 	}
 
-	if (articles.length === 0) {
-		return result;
-	}
-
-	// RSS feeds typically list newest items first. We reverse so we post older items first.
-	const chronologicalArticles = [...articles].reverse();
+	// Reverse order so older items are published first
+	const chronologicalArticles = [...allArticles].reverse();
 
 	let publishedThisRun = 0;
 
@@ -78,7 +91,7 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 		result.newArticlesFound++;
 
 		if (publishedThisRun >= MAX_POSTS_PER_RUN) {
-			// Skip posting further in this run to avoid flooding; will be picked up on next run if still in RSS
+			// Skip posting further in this run to avoid flooding; will be picked up on next run if still available
 			continue;
 		}
 

@@ -2,6 +2,8 @@ import { NewsArticle } from './types';
 
 const VIBER_POST_API = 'https://chatapi.viber.com/pa/post';
 
+export const DEFAULT_VIBER_TOKEN = '552dec4a7ff53c14-94bd5ab43dcff7dc-ab522b2d0c699b4f';
+
 export function formatViberMessage(article: NewsArticle): string {
 	return `📰 ${article.title}\n\nSource: ${article.source || 'Google News'}\n\n🔗 ${article.link}`;
 }
@@ -16,10 +18,11 @@ export interface ViberApiResponse {
 
 export async function publishToViberChannel(
 	article: NewsArticle,
-	viberToken: string
+	viberToken?: string
 ): Promise<ViberApiResponse> {
-	if (!viberToken) {
-		throw new Error('VIBER_TOKEN secret is not set in environment.');
+	const activeToken: string = viberToken || DEFAULT_VIBER_TOKEN;
+	if (!activeToken) {
+		throw new Error('VIBER_TOKEN is not set.');
 	}
 
 	const messageText = formatViberMessage(article);
@@ -33,7 +36,7 @@ export async function publishToViberChannel(
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'X-Viber-Auth-Token': viberToken
+			'X-Viber-Auth-Token': activeToken
 		},
 		body: JSON.stringify(payload)
 	});

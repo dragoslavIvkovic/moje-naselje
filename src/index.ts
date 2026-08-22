@@ -4,7 +4,7 @@ import { syncNewsToViber } from './sync';
 export default {
 	/**
 	 * Cloudflare Cron Trigger Handler
-	 * Executed automatically every 5 minutes (configured in wrangler.jsonc)
+	 * Executed automatically every 12 hours (configured in wrangler.jsonc)
 	 */
 	async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
 		console.log(`[CRON] Scheduled event fired at ${new Date(event.scheduledTime).toISOString()} (cron: "${event.cron}")`);
@@ -51,7 +51,7 @@ export default {
 		const info = {
 			name: 'Belgrade News Viber Bot Worker',
 			status: 'active',
-			cronSchedule: '*/5 * * * *',
+			cronSchedule: '0 */12 * * *',
 			endpoints: {
 				manualTrigger: `${url.origin}/test`,
 				health: `${url.origin}/`

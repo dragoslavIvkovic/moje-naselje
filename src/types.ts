@@ -1,7 +1,8 @@
 export interface Env {
-	NEWS_KV: KVNamespace;
-	VIBER_TOKEN: string;
+	NEWS_KV?: KVNamespace;
+	VIBER_TOKEN?: string;
 	NEWS_RSS_URL?: string;
+	BEOGRAD_RS_URL?: string;
 }
 
 export interface NewsArticle {
