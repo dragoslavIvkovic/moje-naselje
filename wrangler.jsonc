@@ -6,9 +6,9 @@
 	"observability": {
 		"enabled": true
 	},
-	// Cron Trigger: Runs automatically every 10 minutes
+	// Cron Trigger: Runs automatically every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
 	"triggers": {
-		"crons": ["*/10 * * * *"]
+		"crons": ["0 */6 * * *"]
 	},
 	// Environment Variables
 	"vars": {
