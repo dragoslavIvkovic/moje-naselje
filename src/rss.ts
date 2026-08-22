@@ -3,22 +3,39 @@ import { NewsArticle } from './types';
 
 export const DEFAULT_RSS_URL = 'https://news.google.com/rss/search?q=%22vojvode+vlahovica%22+OR+%22vojvode+vlahovi%C4%87a%22+OR+%22vojvode+vlahovi%C4%87%22+OR+%22%D0%B2%D0%BE%D1%98%D0%B2%D0%BE%D0%B4%D0%B5+%D0%B2%D0%BB%D0%B0%D1%85%D0%BE%D0%B2%D0%B8%D1%9B%D0%B0%22+OR+%22%D0%B2%D0%BE%D1%98%D0%B2%D0%BE%D0%B4%D0%B5+%D0%B2%D0%BB%D0%B0%D1%85%D0%BE%D0%B2%D0%B8%D1%9B%22&hl=sr-Latn&gl=RS&ceid=RS:sr-Latn';
 
-export async function fetchGoogleNews(rssUrl: string = DEFAULT_RSS_URL): Promise<NewsArticle[]> {
-	const urlToFetch = rssUrl || DEFAULT_RSS_URL;
-	const response = await fetch(urlToFetch, {
-		headers: {
-			'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-			'Accept': 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.1',
-			'Accept-Language': 'sr-Latn,sr;q=0.9,en-US;q=0.8,en;q=0.7'
-		}
-	});
+const FALLBACK_RSS_URL = 'https://news.google.com/rss/search?q=Vojvode+Vlahovica&hl=sr-Latn&gl=RS&ceid=RS:sr-Latn';
 
-	if (!response.ok) {
-		throw new Error(`Failed to fetch RSS feed: HTTP ${response.status} ${response.statusText}`);
+export async function fetchGoogleNews(rssUrl: string = DEFAULT_RSS_URL): Promise<NewsArticle[]> {
+	const urls = [rssUrl || DEFAULT_RSS_URL, FALLBACK_RSS_URL];
+	let lastError: Error | null = null;
+
+	for (const url of urls) {
+		for (let attempt = 0; attempt < 2; attempt++) {
+			try {
+				const response = await fetch(url, {
+					headers: {
+						'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+						'Accept': 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.1',
+						'Accept-Language': 'sr-Latn,sr;q=0.9,en-US;q=0.8,en;q=0.7'
+					}
+				});
+
+				if (response.ok) {
+					const xmlText = await response.text();
+					return parseRssXml(xmlText);
+				}
+
+				lastError = new Error(`HTTP ${response.status} ${response.statusText}`);
+			} catch (err: any) {
+				lastError = err;
+			}
+
+			// Short pause before retry
+			await new Promise(resolve => setTimeout(resolve, 500));
+		}
 	}
 
-	const xmlText = await response.text();
-	return parseRssXml(xmlText);
+	throw lastError || new Error('Failed to fetch Google News RSS');
 }
 
 export function parseRssXml(xmlContent: string): NewsArticle[] {
