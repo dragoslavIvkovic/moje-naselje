@@ -96,7 +96,7 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 		}
 
 		try {
-			await publishToViberChannel(article, env.VIBER_TOKEN);
+			await publishToViberChannel(article, env.VIBER_TOKEN, env.VIBER_ADMIN_ID);
 
 			// Mark as published in KV
 			if (env.NEWS_KV) {

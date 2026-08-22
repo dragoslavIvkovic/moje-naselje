@@ -1,6 +1,7 @@
 export interface Env {
 	NEWS_KV?: KVNamespace;
 	VIBER_TOKEN?: string;
+	VIBER_ADMIN_ID?: string;
 	NEWS_RSS_URL?: string;
 	BEOGRAD_RS_URL?: string;
 }
