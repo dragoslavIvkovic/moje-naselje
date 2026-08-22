@@ -14,21 +14,23 @@
 		"crons": ["0 */12 * * *"]
 	},
 	/**
-	 * Cloudflare KV Namespace for deduplicating published articles
-	 * Create one via: npx wrangler kv namespace create NEWS_KV
-	 * Replace "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" with the generated ID.
-	 */
-	"kv_namespaces": [
-		{
-			"binding": "NEWS_KV",
-			"id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
-		}
-	],
-	/**
 	 * Environment Variables
 	 */
 	"vars": {
 		"NEWS_RSS_URL": "https://news.google.com/rss/search?q=Beograd+Serbia&hl=sr-Latn&gl=RS&ceid=RS:sr-Latn",
 		"BEOGRAD_RS_URL": "https://www.beograd.rs/lat/vesti"
 	}
+	/**
+	 * KV Namespace for article deduplication:
+	 * You can bind it directly in the Cloudflare Dashboard under:
+	 * Workers & Pages > moje-naselje > Settings > Bindings > Add > KV Namespace (Variable name: NEWS_KV)
+	 * OR uncomment below with your real namespace ID:
+	 *
+	 * "kv_namespaces": [
+	 *   {
+	 *     "binding": "NEWS_KV",
+	 *     "id": "<your-real-kv-id>"
+	 *   }
+	 * ]
+	 */
 }
