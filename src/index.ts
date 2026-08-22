@@ -1,6 +1,12 @@
 import { Env } from './types';
 import { syncNewsToViber } from './sync';
 
+/**
+ * Dummy export to satisfy Cloudflare API backward-compatibility check
+ * if previous deployments had WorkflowStatusDO Durable Object bound.
+ */
+export class WorkflowStatusDO {}
+
 export default {
 	/**
 	 * Cloudflare Cron Trigger Handler
