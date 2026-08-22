@@ -1,0 +1,9 @@
+# Cloudflare Secrets and Local Environment Variables
+# Copy this file to .dev.vars for local testing with `wrangler dev`
+
+# Your Viber Authentication Token for your Channel / Public Account
+# For production, set this via: npx wrangler secret put VIBER_TOKEN
+VIBER_TOKEN="552dec4a7ff53c14-94bd5ab43dcff7dc-ab522b2d0c699b4f"
+
+# Optional: Override the RSS feed URL (defaults to Belgrade news in Serbian Latin)
+NEWS_RSS_URL="https://news.google.com/rss/search?q=Beograd+Serbia&hl=sr-Latn&gl=RS&ceid=RS:sr-Latn"

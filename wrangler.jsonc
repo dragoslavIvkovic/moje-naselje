@@ -1,53 +1,34 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "moje-naselje",
-	"main": "worker/index.ts",
+	"main": "src/index.ts",
 	"compatibility_date": "2025-10-08",
-	"assets": {
-		"directory": "./dist",
-		"not_found_handling": "single-page-application"
-	},
 	"observability": {
 		"enabled": true
 	},
 	/**
-	 * Workflows
-	 * Define Workflows to orchestrate multi-step processes
-	 * https://developers.cloudflare.com/workflows/
+	 * Cron Triggers
+	 * Runs the Worker automatically every 12 hours (00:00 and 12:00 UTC)
 	 */
-	"workflows": [
-		{
-			"name": "my-workflow",
-			"binding": "MY_WORKFLOW",
-			"class_name": "MyWorkflow"
-		}
-	],
-	/**
-	 * Durable Objects
-	 * Used for WebSocket state management and real-time updates
-	 * https://developers.cloudflare.com/durable-objects/
-	 */
-	"durable_objects": {
-		"bindings": [
-			{
-				"name": "WORKFLOW_STATUS",
-				"class_name": "WorkflowStatusDO"
-			}
-		]
+	"triggers": {
+		"crons": ["0 */12 * * *"]
 	},
 	/**
-	 * Migrations
-	 * Required for Durable Objects
+	 * Cloudflare KV Namespace for deduplicating published articles
+	 * Create one via: npx wrangler kv namespace create NEWS_KV
+	 * Replace "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" with the generated ID.
 	 */
-	"migrations": [
+	"kv_namespaces": [
 		{
-			"tag": "v1",
-			"new_sqlite_classes": ["WorkflowStatusDO"]
+			"binding": "NEWS_KV",
+			"id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
 		}
 	],
-	"upload_source_maps": true
+	/**
+	 * Environment Variables
+	 */
+	"vars": {
+		"NEWS_RSS_URL": "https://news.google.com/rss/search?q=Beograd+Serbia&hl=sr-Latn&gl=RS&ceid=RS:sr-Latn",
+		"BEOGRAD_RS_URL": "https://www.beograd.rs/lat/vesti"
+	}
 }
