@@ -18,38 +18,11 @@ const KV_TTL_SECONDS = 60 * 60 * 24 * 30;
 const MAX_POSTS_PER_RUN = 20;
 
 /**
- * Filter strictly for articles mentioning Vojvode Vlahović / Vojvode Vlahovića in Latin or Cyrillic
+ * Filter for articles mentioning Vojvode Vlahović / Vojvode Vlahovića in Latin or Cyrillic
  */
 export function isVojvodeVlahovicaArticle(article: NewsArticle): boolean {
 	const text = `${article.title} ${article.link}`.toLowerCase();
 	return text.includes('vlahovi') || text.includes('влахови');
-}
-
-/**
- * Returns today's date string (YYYY-MM-DD) in Belgrade timezone (Europe/Belgrade)
- */
-export function getTodayBelgrade(): string {
-	return new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Belgrade' });
-}
-
-/**
- * Check if an article's pubDate falls on today (Belgrade timezone).
- * Articles without a parseable date are allowed through.
- */
-export function isTodayArticle(article: NewsArticle, todayStr: string): boolean {
-	if (!article.pubDate) {
-		return true; // no date info — allow through
-	}
-	try {
-		const articleDate = new Date(article.pubDate);
-		if (isNaN(articleDate.getTime())) {
-			return true; // unparseable — allow through
-		}
-		const articleDay = articleDate.toLocaleDateString('en-CA', { timeZone: 'Europe/Belgrade' });
-		return articleDay === todayStr;
-	} catch {
-		return true;
-	}
 }
 
 export async function syncNewsToViber(env: Env): Promise<SyncResult> {
@@ -82,12 +55,8 @@ export async function syncNewsToViber(env: Env): Promise<SyncResult> {
 		console.warn(errorMsg);
 	}
 
-	const todayStr = getTodayBelgrade();
-
-	// Filter: only Vojvode Vlahovica articles AND only from today
-	const articles = rawArticles
-		.filter(isVojvodeVlahovicaArticle)
-		.filter(a => isTodayArticle(a, todayStr));
+	// Filter strictly for Vojvode Vlahovica articles
+	const articles = rawArticles.filter(isVojvodeVlahovicaArticle);
 
 	result.totalFetched = articles.length;
 
